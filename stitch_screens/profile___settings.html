@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-error-container": "#93000a",
+                    "on-tertiary-container": "#f39461",
+                    "primary-fixed-dim": "#b6c4ff",
+                    "on-surface": "#191c1e",
+                    "surface-container-highest": "#e0e3e5",
+                    "primary": "#00236f",
+                    "primary-container": "#1e3a8a",
+                    "on-error": "#ffffff",
+                    "tertiary": "#4b1c00",
+                    "error": "#ba1a1a",
+                    "outline": "#757682",
+                    "surface-variant": "#e0e3e5",
+                    "on-surface-variant": "#444651",
+                    "on-primary-fixed": "#00164e",
+                    "tertiary-container": "#6e2c00",
+                    "outline-variant": "#c5c5d3",
+                    "surface-container-high": "#e6e8ea",
+                    "surface-bright": "#f7f9fb",
+                    "on-background": "#191c1e",
+                    "secondary-fixed": "#6ffbbe",
+                    "on-primary": "#ffffff",
+                    "surface-tint": "#4059aa",
+                    "on-secondary": "#ffffff",
+                    "on-secondary-container": "#00714d",
+                    "error-container": "#ffdad6",
+                    "inverse-on-surface": "#eff1f3",
+                    "on-tertiary": "#ffffff",
+                    "surface-container-low": "#f2f4f6",
+                    "background": "#f7f9fb",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary-container": "#6cf8bb",
+                    "secondary-fixed-dim": "#4edea3",
+                    "secondary": "#006c49",
+                    "surface": "#f7f9fb",
+                    "inverse-surface": "#2d3133",
+                    "on-tertiary-fixed": "#341100",
+                    "tertiary-fixed-dim": "#ffb691",
+                    "primary-fixed": "#dce1ff",
+                    "on-primary-container": "#90a8ff",
+                    "surface-dim": "#d8dadc",
+                    "on-secondary-fixed": "#002113",
+                    "surface-container": "#eceef0",
+                    "on-secondary-fixed-variant": "#005236",
+                    "on-tertiary-fixed-variant": "#773205",
+                    "inverse-primary": "#b6c4ff",
+                    "on-primary-fixed-variant": "#264191",
+                    "tertiary-fixed": "#ffdbcb"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .tonal-transition { transition: background-color 0.3s ease; }
+        .no-border { border: none !important; }
+        .active-tab-glow { position: relative; }
+        .active-tab-glow::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #006c49;
+        }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface">
+<!-- SideNavBar (Shared Component) -->
+<aside class="h-screen w-64 fixed left-0 top-0 bg-[#f2f4f6] dark:bg-slate-900 flex flex-col p-4 gap-2 font-['Manrope'] font-medium text-sm no-border z-50">
+<div class="mb-8 px-2">
+<span class="text-xl font-bold text-[#00236f] dark:text-white">Vault Fintech</span>
+</div>
+<nav class="flex-1 flex flex-col gap-1">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 hover:pl-2 transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 hover:pl-2 transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="account_balance">account_balance</span>
+<span>Accounts</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 hover:pl-2 transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span>
+<span>Transactions</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 hover:pl-2 transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="credit_card">credit_card</span>
+<span>Cards</span>
+</a>
+<!-- Active State for Settings -->
+<a class="flex items-center gap-3 px-4 py-3 bg-white dark:bg-slate-800 text-[#00236f] dark:text-white rounded-lg shadow-sm font-bold active:scale-98" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span>Settings</span>
+</a>
+</nav>
+<div class="mt-auto pt-4 border-t border-slate-200 dark:border-slate-800">
+<div class="flex items-center gap-3 px-2 mb-6">
+<img alt="User Profile" class="w-10 h-10 rounded-full object-cover" data-alt="Close-up studio portrait of a professional man with a friendly expression, wearing a tailored navy blazer against a neutral grey background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBUzb3aRQaQ5DUOBCa7UnBQ1XGJKV-QZANWdPvZn36degaOoL_JvlxpARM6l9h4fsuAM5blhU3Wdq5VJr4n45jifnbsJ04QXINHz8LziUpHInSFTWTpkPxOWpo9HDenRozXBaVVZ31j0gc4pR8xSKirJnWhVR8dXfS3AntOAyc3AY3ghrO-uzJAe94t6EHfJY3I0JlTSHjXXFpAclL5c7sFCPnx7N79Fxz6ayOAq9LAKnnYXraOzaKgvsLCnIHqSTXtiOfNqEF-bw"/>
+<div class="flex flex-col">
+<span class="text-on-surface font-bold text-xs">Alexander Vault</span>
+<span class="text-on-surface-variant text-[10px]">Premium Member</span>
+</div>
+</div>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 hover:pl-2 transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span>Log out</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Shell -->
+<main class="ml-64 min-h-screen">
+<!-- TopNavBar (Dashboard Header Variant) -->
+<header class="sticky top-0 w-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg flex justify-between items-center px-8 h-20 z-40 no-border tonal-shift">
+<div class="flex items-center bg-surface-container rounded-full px-4 py-2 w-96 transition-all duration-300 hover:bg-surface-container-high">
+<span class="material-symbols-outlined text-outline mr-2" data-icon="search">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-full font-body" placeholder="Search settings..." type="text"/>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-all duration-300">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<div class="h-8 w-[1px] bg-outline-variant/30"></div>
+<div class="flex items-center gap-2">
+<span class="text-sm font-bold text-primary font-headline">Settings</span>
+</div>
+</div>
+</header>
+<!-- Content Canvas -->
+<div class="p-10 max-w-6xl mx-auto">
+<!-- Editorial Header -->
+<div class="mb-12">
+<h1 class="text-4xl font-extrabold text-primary font-headline tracking-tight mb-2">Account Settings</h1>
+<p class="text-on-surface-variant max-w-xl">Manage your personal information, security preferences, and global notification settings for your Vault account.</p>
+</div>
+<!-- Bento Grid Settings Layout -->
+<div class="grid grid-cols-12 gap-6">
+<!-- Left Nav / Tabs Section -->
+<div class="col-span-12 md:col-span-3">
+<div class="flex flex-col gap-2 sticky top-28">
+<button class="flex items-center gap-3 px-4 py-3 text-primary font-bold bg-surface-container-low rounded-xl transition-all duration-200">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="text-sm">Personal Info</span>
+</button>
+<button class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-lowest transition-all duration-200 rounded-xl">
+<span class="material-symbols-outlined" data-icon="security">security</span>
+<span class="text-sm">Security</span>
+</button>
+<button class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-lowest transition-all duration-200 rounded-xl">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="text-sm">Notifications</span>
+</button>
+<button class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-lowest transition-all duration-200 rounded-xl">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+<span class="text-sm">Billing</span>
+</button>
+</div>
+</div>
+<!-- Main Forms Section -->
+<div class="col-span-12 md:col-span-9 space-y-8">
+<!-- Section: Personal Info -->
+<div class="bg-surface-container-lowest p-8 rounded-2xl shadow-sm border-l-4 border-secondary">
+<div class="flex justify-between items-center mb-8">
+<h2 class="text-xl font-bold font-headline text-primary">Personal Information</h2>
+<button class="bg-primary text-white px-6 py-2 rounded-xl text-xs font-bold hover:opacity-90 transition-opacity uppercase tracking-wider">Save Changes</button>
+</div>
+<form class="grid grid-cols-2 gap-6">
+<div class="flex flex-col gap-2">
+<label class="text-xs font-bold text-on-surface-variant ml-1 uppercase">Full Name</label>
+<input class="bg-surface-container-highest border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-fixed-dim transition-all" type="text" value="Alexander Vault"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-xs font-bold text-on-surface-variant ml-1 uppercase">Email Address</label>
+<input class="bg-surface-container-highest border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-fixed-dim transition-all" type="email" value="alexander@vault-editorial.com"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-xs font-bold text-on-surface-variant ml-1 uppercase">Phone Number</label>
+<input class="bg-surface-container-highest border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-fixed-dim transition-all" type="tel" value="+1 (555) 012-3456"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-xs font-bold text-on-surface-variant ml-1 uppercase">Country</label>
+<select class="bg-surface-container-highest border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-fixed-dim transition-all">
+<option>United States</option>
+<option>United Kingdom</option>
+<option>Germany</option>
+</select>
+</div>
+<div class="col-span-2 flex flex-col gap-2">
+<label class="text-xs font-bold text-on-surface-variant ml-1 uppercase">Home Address</label>
+<textarea class="bg-surface-container-highest border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-fixed-dim transition-all" rows="3">721 Editorial Plaza, Suite 400, New York, NY 10012</textarea>
+</div>
+</form>
+</div>
+<!-- Section: Security -->
+<div class="bg-surface-container-low p-8 rounded-2xl">
+<h2 class="text-xl font-bold font-headline text-primary mb-6">Security &amp; Protection</h2>
+<div class="space-y-6">
+<!-- 2FA Toggle -->
+<div class="flex items-center justify-between p-4 bg-white/50 rounded-xl">
+<div class="flex items-center gap-4">
+<div class="p-3 bg-secondary-container rounded-full text-on-secondary-container">
+<span class="material-symbols-outlined" data-icon="verified_user">verified_user</span>
+</div>
+<div>
+<p class="font-bold text-sm">Two-Factor Authentication</p>
+<p class="text-xs text-on-surface-variant">Add an extra layer of security to your account.</p>
+</div>
+</div>
+<div class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
+</div>
+</div>
+<!-- Password Change -->
+<div class="flex items-center justify-between p-4 bg-white/50 rounded-xl">
+<div class="flex items-center gap-4">
+<div class="p-3 bg-primary-fixed rounded-full text-primary">
+<span class="material-symbols-outlined" data-icon="lock_reset">lock_reset</span>
+</div>
+<div>
+<p class="font-bold text-sm">Account Password</p>
+<p class="text-xs text-on-surface-variant">Last updated 3 months ago.</p>
+</div>
+</div>
+<button class="text-primary text-xs font-bold hover:underline decoration-secondary underline-offset-4">Change Password</button>
+</div>
+</div>
+</div>
+<!-- Section: Notifications -->
+<div class="bg-surface-container p-8 rounded-2xl">
+<h2 class="text-xl font-bold font-headline text-primary mb-6">Notification Preferences</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<label class="flex items-center gap-4 p-4 bg-white/40 rounded-xl cursor-pointer hover:bg-white/60 transition-colors">
+<input checked="" class="w-5 h-5 rounded border-none bg-surface-container-highest text-secondary focus:ring-secondary" type="checkbox"/>
+<div class="flex flex-col">
+<span class="text-sm font-bold">Email Alerts</span>
+<span class="text-[10px] text-on-surface-variant">Weekly summary and reports</span>
+</div>
+</label>
+<label class="flex items-center gap-4 p-4 bg-white/40 rounded-xl cursor-pointer hover:bg-white/60 transition-colors">
+<input checked="" class="w-5 h-5 rounded border-none bg-surface-container-highest text-secondary focus:ring-secondary" type="checkbox"/>
+<div class="flex flex-col">
+<span class="text-sm font-bold">Push Notifications</span>
+<span class="text-[10px] text-on-surface-variant">Real-time transaction alerts</span>
+</div>
+</label>
+<label class="flex items-center gap-4 p-4 bg-white/40 rounded-xl cursor-pointer hover:bg-white/60 transition-colors">
+<input class="w-5 h-5 rounded border-none bg-surface-container-highest text-secondary focus:ring-secondary" type="checkbox"/>
+<div class="flex flex-col">
+<span class="text-sm font-bold">Marketing Emails</span>
+<span class="text-[10px] text-on-surface-variant">New feature updates and news</span>
+</div>
+</label>
+<label class="flex items-center gap-4 p-4 bg-white/40 rounded-xl cursor-pointer hover:bg-white/60 transition-colors">
+<input checked="" class="w-5 h-5 rounded border-none bg-surface-container-highest text-secondary focus:ring-secondary" type="checkbox"/>
+<div class="flex flex-col">
+<span class="text-sm font-bold">SMS Security Alerts</span>
+<span class="text-[10px] text-on-surface-variant">Critical account changes</span>
+</div>
+</label>
+</div>
+</div>
+<!-- Decorative Branding Element -->
+<div class="relative h-48 w-full rounded-2xl overflow-hidden group">
+<img alt="Abstract Background" class="w-full h-full object-cover" data-alt="Modern abstract design with fluid metallic curves in deep blue and emerald green hues, soft atmospheric lighting, premium architectural feel" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD-wEnBQAu7PDY0ZMJq0VnsnzdWaOxWGilTorLF-6awrnhZAH7XU4DKHt3G8nIboHJZR4RR_QlNm1nq0YHMiajr5Lq3_EksdgT3YfMPeSo6cafDFQG3s2b61VFofq4xJQOkXgChBGHZqXgZIO24wh1gm4D1XFcKHV0mR3fXmhzAD3T2wSJ0ej9jBT_x5U1iVNRb8GHHou0Ha2K-Rrsu8StZTQTbNOqTiS8Tq2LQdFRabe5S32mHz8c_w-xEss2V1oGk7zGVNwH_yQ"/>
+<div class="absolute inset-0 bg-primary/40 backdrop-blur-sm flex flex-col justify-center px-10">
+<h3 class="text-white text-2xl font-black font-headline mb-2">Vault Premium</h3>
+<p class="text-white/80 text-sm max-w-sm mb-4">Your current membership grants you unlimited transaction history and priority editorial insights.</p>
+<button class="bg-secondary text-white w-fit px-6 py-2 rounded-xl text-xs font-bold uppercase tracking-widest shadow-xl shadow-secondary/20">Learn More</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer (Shared Component) -->
+<footer class="w-full py-12 border-t border-slate-200 dark:border-slate-800 bg-[#f7f9fb] dark:bg-slate-950 no-border tonal-layering">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-8 max-w-7xl mx-auto px-6">
+<div class="col-span-1 md:col-span-2">
+<span class="text-lg font-black text-[#00236f] dark:text-white mb-4 block">Vault Editorial Fintech</span>
+<p class="font-['Inter'] text-xs text-slate-500 max-w-xs">Elevating the banking experience through curated digital design and architectural precision.</p>
+</div>
+<div class="flex flex-col gap-3">
+<span class="text-primary dark:text-blue-400 font-bold text-sm uppercase tracking-widest">Resources</span>
+<a class="font-['Inter'] text-xs text-slate-500 hover:text-[#00236f] hover:underline decoration-[#006c49] underline-offset-4 transition-all" href="#">Privacy Policy</a>
+<a class="font-['Inter'] text-xs text-slate-500 hover:text-[#00236f] hover:underline decoration-[#006c49] underline-offset-4 transition-all" href="#">Terms of Service</a>
+</div>
+<div class="flex flex-col gap-3">
+<span class="text-primary dark:text-blue-400 font-bold text-sm uppercase tracking-widest">Connect</span>
+<a class="font-['Inter'] text-xs text-slate-500 hover:text-[#00236f] hover:underline decoration-[#006c49] underline-offset-4 transition-all" href="#">Security</a>
+<a class="font-['Inter'] text-xs text-slate-500 hover:text-[#00236f] hover:underline decoration-[#006c49] underline-offset-4 transition-all" href="#">Sitemap</a>
+</div>
+</div>
+<div class="max-w-7xl mx-auto px-6 mt-12 pt-8 border-t border-slate-100 dark:border-slate-900 text-center">
+<p class="font-['Inter'] text-xs text-slate-500 opacity-80">© 2024 Vault Editorial Fintech. All rights reserved.</p>
+</div>
+</footer>
+</main>
+</body></html>

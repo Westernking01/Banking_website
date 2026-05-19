@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Vault Fintech - Card Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error-container": "#93000a",
+                        "on-tertiary-container": "#f39461",
+                        "primary-fixed-dim": "#b6c4ff",
+                        "on-surface": "#191c1e",
+                        "surface-container-highest": "#e0e3e5",
+                        "primary": "#00236f",
+                        "primary-container": "#1e3a8a",
+                        "on-error": "#ffffff",
+                        "tertiary": "#4b1c00",
+                        "error": "#ba1a1a",
+                        "outline": "#757682",
+                        "surface-variant": "#e0e3e5",
+                        "on-surface-variant": "#444651",
+                        "on-primary-fixed": "#00164e",
+                        "tertiary-container": "#6e2c00",
+                        "outline-variant": "#c5c5d3",
+                        "surface-container-high": "#e6e8ea",
+                        "surface-bright": "#f7f9fb",
+                        "on-background": "#191c1e",
+                        "secondary-fixed": "#6ffbbe",
+                        "on-primary": "#ffffff",
+                        "surface-tint": "#4059aa",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-container": "#00714d",
+                        "error-container": "#ffdad6",
+                        "inverse-on-surface": "#eff1f3",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-low": "#f2f4f6",
+                        "background": "#f7f9fb",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-container": "#6cf8bb",
+                        "secondary-fixed-dim": "#4edea3",
+                        "secondary": "#006c49",
+                        "surface": "#f7f9fb",
+                        "inverse-surface": "#2d3133",
+                        "on-tertiary-fixed": "#341100",
+                        "tertiary-fixed-dim": "#ffb691",
+                        "primary-fixed": "#dce1ff",
+                        "on-primary-container": "#90a8ff",
+                        "surface-dim": "#d8dadc",
+                        "on-secondary-fixed": "#002113",
+                        "surface-container": "#eceef0",
+                        "on-secondary-fixed-variant": "#005236",
+                        "on-tertiary-fixed-variant": "#773205",
+                        "inverse-primary": "#b6c4ff",
+                        "on-primary-fixed-variant": "#264191",
+                        "tertiary-fixed": "#ffdbcb"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .tonal-transition { transition: background-color 0.3s ease; }
+        .no-line { border: none !important; }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(24px);
+        }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface">
+<!-- SideNavBar Anchor -->
+<aside class="h-screen w-64 fixed left-0 top-0 bg-[#f2f4f6] dark:bg-slate-900 flex flex-col p-4 gap-2 font-['Manrope'] font-medium text-sm no-line">
+<div class="mb-8 px-2">
+<span class="text-xl font-bold text-[#00236f] dark:text-white">Vault Fintech</span>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="account_balance">account_balance</span>
+                Accounts
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span>
+                Transactions
+            </a>
+<!-- Active State Logic: Cards is active -->
+<a class="flex items-center gap-3 px-4 py-3 bg-white dark:bg-slate-800 text-[#00236f] dark:text-white rounded-lg shadow-sm font-bold active:scale-98" href="#">
+<span class="material-symbols-outlined" data-icon="credit_card" style="font-variation-settings: 'FILL' 1;">credit_card</span>
+                Cards
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+                Settings
+            </a>
+</nav>
+<div class="mt-auto pt-4 space-y-4">
+<div class="bg-primary-container p-4 rounded-xl text-white">
+<p class="text-xs opacity-80 mb-2">Current Plan</p>
+<p class="font-bold mb-3">Premium Member</p>
+<button class="w-full bg-secondary-container text-on-secondary-container text-xs font-bold py-2 rounded-lg hover:opacity-90 transition-opacity">Upgrade Plan</button>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-all rounded-lg cursor-pointer">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+                Log out
+            </div>
+</div>
+</aside>
+<!-- TopNavBar Anchor -->
+<header class="sticky top-0 ml-64 w-[calc(100%-16rem)] z-40 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg flex justify-between items-center px-8 h-20 no-line tonal-transition bg-[#f7f9fb] dark:bg-slate-950">
+<div class="flex items-center gap-4 bg-surface-container rounded-full px-4 py-2 w-96">
+<span class="material-symbols-outlined text-outline" data-icon="search">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-full placeholder:text-outline" placeholder="Search transactions, cards..." type="text"/>
+</div>
+<div class="flex items-center gap-6">
+<button class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-all text-slate-400">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<div class="flex items-center gap-3 pl-4 border-l border-outline-variant/20">
+<div class="text-right">
+<p class="text-sm font-bold text-primary dark:text-blue-400">Alexander Vault</p>
+<p class="text-[10px] text-outline uppercase tracking-wider">Premium Account</p>
+</div>
+<img alt="User Profile" class="w-10 h-10 rounded-full object-cover" data-alt="professional headshot of a businessman in his 30s with short hair wearing a navy suit against a soft grey background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBNzTEgXGmyBdJpZom2CZBYRSrKAQ9m8Us2ifEzLIK4fP1KPyO2wK_MvU_mnqMMGc5fLJCbqj2ONIxSPSO0Am04t6WIWcC_s76rTmbPEO9qatlrmMMUZUGHwCnnoukzuPW53Ol8GY2FraPrCudYBf_2xReWuuzREMLQqLsrVPX7k2acUws1NqfsDs2DUBtqfyvnLI9P5h0l2SSorZGt7ngat35Ot1cKLQ_1qiGZL4TJwkQxzE5064uZHg-xQes-qDYIqyvdKAi0HQ"/>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-64 p-8 min-h-screen">
+<div class="max-w-6xl mx-auto">
+<header class="mb-10">
+<h1 class="font-headline text-4xl font-extrabold text-primary tracking-tight">Card Management</h1>
+<p class="text-on-surface-variant mt-2">Control your virtual assets and spending limits in real-time.</p>
+</header>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Virtual Card Visual & Primary Info -->
+<div class="lg:col-span-5 space-y-6">
+<!-- High Fidelity Virtual Card -->
+<div class="relative w-full aspect-[1.586/1] rounded-[24px] overflow-hidden shadow-2xl group">
+<div class="absolute inset-0 bg-gradient-to-br from-primary via-[#1e3a8a] to-[#00164e]" data-alt="deep navy abstract background with subtle light flares and tech patterns"></div>
+<div class="absolute inset-0 opacity-20" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuB_nrGgNiHC2lpu5iCdQW8IYMSzvjEo-0FWW3F0c-13thS96wViqVO0o93IS0ZBXP9BboLrUs_u5Cnqwiv3tHyyoqlaSPVX_TYuLOCuo8rFvylQJnJtZtO_4a4UCJdLVoaCN1kA2oJxOrLysZABxvS8smzNkX_lN-PHc753F1Zs8pDw3N8tCyKG33YmNV84vNrAr1aq4WgPeHjV288e90ejY8wXMrJESRmZOkn4fgCUDz1Yp7OmCO3Xfin-kQdjVUeiitK05F3BSg');"></div>
+<div class="relative h-full p-8 flex flex-col justify-between text-white">
+<div class="flex justify-between items-start">
+<div class="flex flex-col">
+<span class="text-[10px] uppercase tracking-[0.2em] opacity-70">Premium Virtual</span>
+<span class="font-headline text-xl font-bold italic tracking-tighter">VAULT</span>
+</div>
+<span class="material-symbols-outlined text-4xl" data-icon="contactless">contactless</span>
+</div>
+<div class="space-y-1">
+<div class="flex gap-4 items-center">
+<span class="text-2xl font-headline tracking-[0.15em] font-medium">••••</span>
+<span class="text-2xl font-headline tracking-[0.15em] font-medium">••••</span>
+<span class="text-2xl font-headline tracking-[0.15em] font-medium">••••</span>
+<span class="text-2xl font-headline tracking-[0.15em] font-medium">8842</span>
+</div>
+<div class="flex gap-8 pt-4">
+<div>
+<p class="text-[8px] uppercase tracking-widest opacity-60">Expiry Date</p>
+<p class="text-sm font-medium tracking-widest">12 / 28</p>
+</div>
+<div>
+<p class="text-[8px] uppercase tracking-widest opacity-60">CVV</p>
+<p class="text-sm font-medium tracking-widest">•••</p>
+</div>
+</div>
+</div>
+<div class="flex justify-between items-end">
+<p class="text-lg font-headline font-semibold tracking-wide">ALEXANDER VAULT</p>
+<div class="w-12 h-8 rounded-md bg-white/10 backdrop-blur-md flex items-center justify-center">
+<div class="w-6 h-6 rounded-full bg-[#eb001b] -mr-2 opacity-90"></div>
+<div class="w-6 h-6 rounded-full bg-[#f79e1b] opacity-90"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Quick Stats Bento -->
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-surface-container-low p-5 rounded-2xl">
+<p class="text-xs text-on-surface-variant font-medium">Active Since</p>
+<p class="text-xl font-headline font-bold text-primary mt-1">Mar 2024</p>
+</div>
+<div class="bg-surface-container-low p-5 rounded-2xl">
+<p class="text-xs text-on-surface-variant font-medium">Card Status</p>
+<div class="flex items-center gap-2 mt-1">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<p class="text-xl font-headline font-bold text-secondary">Active</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Controls & Limits -->
+<div class="lg:col-span-7 space-y-8">
+<!-- Card Controls Section -->
+<section class="bg-surface-container-lowest p-8 rounded-3xl shadow-sm">
+<h3 class="font-headline text-lg font-bold text-primary mb-6">Security Controls</h3>
+<div class="space-y-6">
+<!-- Toggle 1 -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-xl bg-error-container/30 flex items-center justify-center text-error">
+<span class="material-symbols-outlined" data-icon="ac_unit">ac_unit</span>
+</div>
+<div>
+<p class="font-bold text-primary">Freeze Card</p>
+<p class="text-xs text-on-surface-variant">Instantly block all new transactions</p>
+</div>
+</div>
+<button class="w-12 h-6 rounded-full bg-outline-variant relative transition-colors">
+<span class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-all"></span>
+</button>
+</div>
+<!-- Toggle 2 -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-xl bg-secondary-container/30 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined" data-icon="language">language</span>
+</div>
+<div>
+<p class="font-bold text-primary">Online Payments</p>
+<p class="text-xs text-on-surface-variant">Allow web and mobile app purchases</p>
+</div>
+</div>
+<button class="w-12 h-6 rounded-full bg-secondary relative transition-colors">
+<span class="absolute right-1 top-1 w-4 h-4 bg-white rounded-full transition-all"></span>
+</button>
+</div>
+<!-- Toggle 3 -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-xl bg-primary-fixed/30 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="public">public</span>
+</div>
+<div>
+<p class="font-bold text-primary">International Use</p>
+<p class="text-xs text-on-surface-variant">Enable transactions outside your home country</p>
+</div>
+</div>
+<button class="w-12 h-6 rounded-full bg-secondary relative transition-colors">
+<span class="absolute right-1 top-1 w-4 h-4 bg-white rounded-full transition-all"></span>
+</button>
+</div>
+</div>
+</section>
+<!-- Spending Limits Section -->
+<section class="bg-surface-container-lowest p-8 rounded-3xl shadow-sm">
+<div class="flex justify-between items-center mb-8">
+<h3 class="font-headline text-lg font-bold text-primary">Monthly Spending Limit</h3>
+<span class="text-primary font-headline font-extrabold text-2xl">$12,500</span>
+</div>
+<div class="space-y-8">
+<div class="relative h-2 w-full bg-surface-container rounded-full">
+<div class="absolute left-0 top-0 h-full bg-primary rounded-full w-[65%]"></div>
+<div class="absolute left-[65%] top-1/2 -translate-y-1/2 w-6 h-6 bg-white border-4 border-primary rounded-full shadow-lg cursor-pointer"></div>
+</div>
+<div class="grid grid-cols-2 gap-6">
+<div class="space-y-2">
+<label class="label-md text-[10px] uppercase font-bold text-outline tracking-wider">Current Spending</label>
+<div class="bg-surface-container p-4 rounded-xl">
+<span class="font-headline font-bold text-primary">$8,240.50</span>
+</div>
+</div>
+<div class="space-y-2">
+<label class="label-md text-[10px] uppercase font-bold text-outline tracking-wider">Remaining</label>
+<div class="bg-surface-container-high p-4 rounded-xl">
+<span class="font-headline font-bold text-secondary">$4,259.50</span>
+</div>
+</div>
+</div>
+<button class="w-full bg-gradient-to-r from-primary to-primary-container text-white font-headline font-bold py-4 rounded-xl shadow-lg hover:shadow-primary/20 transition-all active:scale-[0.99]">
+                                Update Card Limits
+                            </button>
+</div>
+</section>
+</div>
+</div>
+<!-- Transactions Contextual List -->
+<section class="mt-12">
+<div class="flex justify-between items-end mb-6 px-2">
+<div>
+<h3 class="font-headline text-2xl font-bold text-primary">Recent Card Activity</h3>
+<p class="text-on-surface-variant text-sm">Latest transactions specifically for this virtual card.</p>
+</div>
+<button class="text-secondary font-bold text-sm hover:underline underline-offset-4">View All</button>
+</div>
+<div class="bg-surface-container-low rounded-3xl overflow-hidden p-2">
+<div class="space-y-1">
+<!-- Transaction Row 1 -->
+<div class="flex items-center justify-between p-4 bg-surface-container-lowest rounded-2xl hover:bg-white transition-colors group">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center overflow-hidden">
+<img alt="Spotify Logo" class="w-8 h-8 object-contain" data-alt="iconic lime green and black circular logo of a popular music streaming service" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAPXXIBSpV3i-KF_QslGs0fn-TPakIANm8eIrChNFd2WLZ52usKZ80PXoUkZFbaADMucuY4cvKJC-XCMLtCgE4K75viQfRaJZwAMX1rzJ1VEyj7j16LtHP-tN-VxgFLWo3n_xsOmOEdS5toNu1U0TDcq8Y4mggSoBYoTXEndtdKkq7FJKH43JlyDA9krqu2E7QEFVy--U4loCzbv2W-m7knjs-CsTYMuKLoYPD9HE5t4NOwtI1trn5z6L78Xj_jGgwETMnOu7Ulkg"/>
+</div>
+<div>
+<p class="font-bold text-primary">Spotify Premium</p>
+<p class="text-xs text-on-surface-variant">Subscription • 2 mins ago</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-headline font-bold text-primary">-$14.99</p>
+<span class="px-2 py-0.5 rounded-full bg-secondary-fixed text-[10px] font-bold text-on-secondary-fixed-variant uppercase">Completed</span>
+</div>
+</div>
+<!-- Transaction Row 2 -->
+<div class="flex items-center justify-between p-4 rounded-2xl hover:bg-white transition-colors group">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center overflow-hidden">
+<img alt="Amazon Logo" class="w-8 h-8 object-contain" data-alt="modern minimalist dark grey background with a stylized yellow arrow logo of an e-commerce giant" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCSu10kFOmVKzCT0zIbbp2G94Ojwr5xUKoxyhFN5sSP17ZF8W9Q231UrAbrTzWHj6fPAaIwAR52rf0wYMv994ruZa-HoPH_96wMEBwxPZ1dlYdUKpM1qG-_zhsm2DIs5DBHtyiwVISZdTHH3ccxsVQMXEqe0RbIbDC3znX_UldD0F_KBBsSI7kJwbMUWR-JfMOljejSFl_YIuP4UpAXbaB2ZEnN8ZdYDrsmLCd4DPcypEW9FeYBocIycWh0tXUAtMvwH82Bz-cGcg"/>
+</div>
+<div>
+<p class="font-bold text-primary">Amazon.com</p>
+<p class="text-xs text-on-surface-variant">Shopping • 4 hours ago</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-headline font-bold text-primary">-$245.10</p>
+<span class="px-2 py-0.5 rounded-full bg-secondary-fixed text-[10px] font-bold text-on-secondary-fixed-variant uppercase">Completed</span>
+</div>
+</div>
+<!-- Transaction Row 3 -->
+<div class="flex items-center justify-between p-4 rounded-2xl hover:bg-white transition-colors group">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-2xl" data-icon="restaurant">restaurant</span>
+</div>
+<div>
+<p class="font-bold text-primary">The Bistro NYC</p>
+<p class="text-xs text-on-surface-variant">Dining • Yesterday</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-headline font-bold text-primary">-$82.00</p>
+<span class="px-2 py-0.5 rounded-full bg-tertiary-fixed text-[10px] font-bold text-on-tertiary-fixed-variant uppercase">Pending</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- Footer Anchor -->
+<footer class="ml-64 bg-[#f7f9fb] dark:bg-slate-950 w-auto py-12 border-t border-slate-200 dark:border-slate-800 no-line tonal-layering">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-8 max-w-6xl mx-auto px-8">
+<div class="col-span-1 md:col-span-1">
+<span class="text-lg font-black text-[#00236f] dark:text-white">Vault Fintech</span>
+<p class="font-['Inter'] text-xs text-slate-500 mt-4 leading-relaxed">
+                    © 2024 Vault Editorial Fintech. All rights reserved. Built for the modern architect of finance.
+                </p>
+</div>
+<div class="flex flex-col gap-3">
+<p class="font-headline font-bold text-primary text-sm mb-2">Platform</p>
+<a class="font-['Inter'] text-xs text-slate-500 hover:text-[#00236f] transition-all underline-offset-4 hover:underline decoration-[#006c49]" href="#">Privacy Policy</a>
+<a class="font-['Inter'] text-xs text-slate-500 hover:text-[#00236f] transition-all underline-offset-4 hover:underline decoration-[#006c49]" href="#">Terms of Service</a>
+</div>
+<div class="flex flex-col gap-3">
+<p class="font-headline font-bold text-primary text-sm mb-2">Support</p>
+<a class="font-['Inter'] text-xs text-slate-500 hover:text-[#00236f] transition-all underline-offset-4 hover:underline decoration-[#006c49]" href="#">Security</a>
+<a class="font-['Inter'] text-xs text-slate-500 hover:text-[#00236f] transition-all underline-offset-4 hover:underline decoration-[#006c49]" href="#">Sitemap</a>
+</div>
+<div class="flex flex-col gap-3">
+<p class="font-headline font-bold text-primary text-sm mb-2">Contact</p>
+<a class="font-['Inter'] text-xs text-slate-500 hover:text-[#00236f] transition-all" href="mailto:support@vault.io">support@vault.io</a>
+<div class="flex gap-4 mt-2">
+<div class="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center cursor-pointer opacity-80 hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-sm" data-icon="share">share</span>
+</div>
+</div>
+</div>
+</div>
+</footer>
+</body></html>
