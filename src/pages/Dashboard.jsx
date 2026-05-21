@@ -4,16 +4,6 @@ import { useAuth } from '../context/AuthContext';
 import { getTransactions, getDashboardStats } from '../api/transactionService';
 import { payBill } from '../api/transferService';
 
-const chartBars = [
-  { day: 'MON', height: '40%', active: false },
-  { day: 'TUE', height: '65%', active: false },
-  { day: 'WED', height: '90%', active: true, label: '$1.2k' },
-  { day: 'THU', height: '50%', active: false },
-  { day: 'FRI', height: '75%', active: false },
-  { day: 'SAT', height: '30%', active: false },
-  { day: 'SUN', height: '45%', active: false },
-];
-
 const upcomingBills = [
   { icon: 'cloud', bg: 'bg-red-50', color: 'text-red-600', name: 'Adobe Creative Cloud', due: 'Due in 2 days', amount: '$54.99' },
   { icon: 'home', bg: 'bg-blue-50', color: 'text-blue-600', name: 'Mortgage Payment', due: 'Due in 5 days', amount: '$2,450.00' },
@@ -29,7 +19,7 @@ export default function Dashboard() {
     monthlyIncome: 0,
     monthlyExpenses: 0,
     incomeGrowth: 0,
-    spendingAnalytics: null
+    spendingAnalytics: null,
   });
   const [timeframe, setTimeframe] = useState('daily');
   const [isReceiveModalOpen, setIsReceiveModalOpen] = useState(false);
@@ -41,7 +31,7 @@ export default function Dashboard() {
       try {
         const [txData, statsData] = await Promise.all([
           getTransactions({ limit: 4 }),
-          getDashboardStats()
+          getDashboardStats(),
         ]);
         if (txData.success) setRecentTxs(txData.data);
         if (statsData.success) setStats(statsData.data);
@@ -54,47 +44,59 @@ export default function Dashboard() {
 
   const getTxStyles = (tx) => {
     if (tx.type === 'credit') {
-      return { icon: 'account_balance_wallet', iconColor: 'text-secondary', categoryBg: 'bg-secondary-container', categoryColor: 'text-on-secondary-container', amountColor: 'text-secondary', amountPrefix: '+' };
+      return {
+        icon: 'account_balance_wallet',
+        iconColor: 'text-secondary',
+        categoryBg: 'bg-secondary-container',
+        categoryColor: 'text-on-secondary-container',
+        amountColor: 'text-secondary',
+        amountPrefix: '+',
+      };
     }
-    return { icon: 'payment', iconColor: 'text-primary', categoryBg: 'bg-surface-container', categoryColor: 'text-on-surface-variant', amountColor: 'text-error', amountPrefix: '-' };
+    return {
+      icon: 'payment',
+      iconColor: 'text-primary',
+      categoryBg: 'bg-surface-container',
+      categoryColor: 'text-on-surface-variant',
+      amountColor: 'text-error',
+      amountPrefix: '-',
+    };
   };
 
   const handlePayBill = async (bill) => {
     setIsPaying(true);
     try {
-      const amount = parseFloat(bill.amount.replace(/[^0-9.-]+/g, ""));
+      const amount = parseFloat(bill.amount.replace(/[^0-9.-]+/g, ''));
       const res = await payBill(amount, bill.name);
       if (res.success) {
         updateUser({ ...user, balance: res.data.newBalance });
         const [txData, statsData] = await Promise.all([
           getTransactions({ limit: 4 }),
-          getDashboardStats()
+          getDashboardStats(),
         ]);
         if (txData.success) setRecentTxs(txData.data);
         if (statsData.success) setStats(statsData.data);
         setIsPayBillModalOpen(false);
-        setBills(prev => prev.filter(b => b.name !== bill.name));
+        setBills((prev) => prev.filter((b) => b.name !== bill.name));
       }
     } catch (err) {
-      console.error("Failed to pay bill", err);
-      alert("Failed to pay bill: " + (err.response?.data?.message || err.message));
+      console.error('Failed to pay bill', err);
+      alert('Failed to pay bill: ' + (err.response?.data?.message || err.message));
     } finally {
       setIsPaying(false);
     }
   };
 
-  const activeChart = stats.spendingAnalytics ? stats.spendingAnalytics[timeframe] : chartBars;
+  const activeChart = stats.spendingAnalytics ? stats.spendingAnalytics[timeframe] : null;
+  const isEmptyChart = !activeChart || activeChart.every((bar) => bar.label === '$0');
 
   return (
-    // CHANGED: p-8 → p-4 md:p-6 lg:p-8 so mobile doesn't have huge padding
     <div className="p-4 md:p-6 lg:p-8 space-y-4 md:space-y-6 lg:space-y-8 max-w-[1600px] mx-auto">
 
       {/* ── Top Row ── */}
-      {/* CHANGED: gap-6 → gap-4 md:gap-6 */}
       <div className="grid grid-cols-12 gap-4 md:gap-6">
 
         {/* Balance Card */}
-        {/* CHANGED: col-span-12 lg:col-span-8 (unchanged but padding inside reduced) */}
         <div className="col-span-12 lg:col-span-8 relative overflow-hidden rounded-3xl bg-primary shadow-2xl p-5 sm:p-8 text-white">
           <div className="absolute top-0 right-0 w-64 h-64 bg-primary-container rounded-full -mr-20 -mt-20 blur-3xl opacity-50" />
           <div className="absolute bottom-0 left-0 w-48 h-48 bg-secondary rounded-full -ml-10 -mb-10 blur-3xl opacity-20" />
@@ -102,7 +104,6 @@ export default function Dashboard() {
             <div className="flex flex-col sm:flex-row justify-between items-start gap-3 sm:gap-0">
               <div>
                 <p className="text-blue-200 text-[10px] sm:text-sm font-medium mb-1 tracking-wide">TOTAL BALANCE</p>
-                {/* CHANGED: text-4xl sm:text-5xl — already good */}
                 <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black font-headline tracking-tight">${balance}</h1>
               </div>
               <div className="bg-white/10 backdrop-blur-md px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl flex items-center gap-2">
@@ -114,11 +115,15 @@ export default function Dashboard() {
               <div className="flex gap-6 sm:gap-8">
                 <div>
                   <p className="text-blue-200 text-[10px] mb-1 font-bold">MONTHLY INCOME</p>
-                  <p className="text-sm sm:text-lg font-bold font-headline">${stats.monthlyIncome.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                  <p className="text-sm sm:text-lg font-bold font-headline">
+                    ${stats.monthlyIncome.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </p>
                 </div>
                 <div>
                   <p className="text-blue-200 text-[10px] mb-1 font-bold">MONTHLY EXPENSES</p>
-                  <p className="text-sm sm:text-lg font-bold font-headline">${stats.monthlyExpenses.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                  <p className="text-sm sm:text-lg font-bold font-headline">
+                    ${stats.monthlyExpenses.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </p>
                 </div>
               </div>
               <div className="flex -space-x-2">
@@ -135,7 +140,6 @@ export default function Dashboard() {
         </div>
 
         {/* Quick Actions */}
-        {/* CHANGED: grid-cols-1 → grid-cols-3 lg:grid-cols-1 so on mobile they show as 3 side-by-side buttons */}
         <div className="col-span-12 lg:col-span-4 grid grid-cols-3 lg:grid-cols-1 gap-3 md:gap-4">
           <Link to="/transfer" className="group relative flex flex-col lg:flex-row items-center justify-center lg:justify-between p-4 lg:p-6 bg-secondary-container rounded-2xl hover:bg-secondary-fixed transition-colors gap-2 lg:gap-0">
             <div className="flex flex-col lg:flex-row items-center gap-2 lg:gap-4">
@@ -146,7 +150,6 @@ export default function Dashboard() {
             </div>
             <span className="material-symbols-outlined text-on-secondary-container hidden lg:block opacity-0 group-hover:opacity-100 transition-opacity">arrow_forward</span>
           </Link>
-
           <button onClick={() => setIsReceiveModalOpen(true)} className="group relative flex flex-col lg:flex-row items-center justify-center lg:justify-between p-4 lg:p-6 bg-white rounded-2xl border border-transparent hover:border-secondary transition-all gap-2 lg:gap-0">
             <div className="flex flex-col lg:flex-row items-center gap-2 lg:gap-4">
               <div className="w-10 h-10 lg:w-12 lg:h-12 bg-secondary/10 rounded-xl flex items-center justify-center">
@@ -156,7 +159,6 @@ export default function Dashboard() {
             </div>
             <span className="material-symbols-outlined text-primary hidden lg:block opacity-0 group-hover:opacity-100 transition-opacity">arrow_forward</span>
           </button>
-
           <button onClick={() => setIsPayBillModalOpen(true)} className="group relative flex flex-col lg:flex-row items-center justify-center lg:justify-between p-4 lg:p-6 bg-white rounded-2xl border border-transparent hover:border-secondary transition-all gap-2 lg:gap-0">
             <div className="flex flex-col lg:flex-row items-center gap-2 lg:gap-4">
               <div className="w-10 h-10 lg:w-12 lg:h-12 bg-secondary/10 rounded-xl flex items-center justify-center">
@@ -170,14 +172,12 @@ export default function Dashboard() {
       </div>
 
       {/* ── Main Content ── */}
-      {/* CHANGED: gap-8 → gap-4 md:gap-6 lg:gap-8 */}
       <div className="grid grid-cols-12 gap-4 md:gap-6 lg:gap-8">
 
         {/* Left Column */}
         <div className="col-span-12 xl:col-span-7 space-y-4 md:space-y-6">
 
-          {/* Spending Analytics */}
-          {/* CHANGED: p-8 → p-4 md:p-6 lg:p-8 */}
+          {/* ── Spending Analytics Chart ── */}
           <div className="bg-white rounded-3xl p-4 md:p-6 lg:p-8 shadow-sm">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3">
               <h2 className="text-lg md:text-xl font-bold font-headline text-primary">Spending Analytics</h2>
@@ -186,30 +186,55 @@ export default function Dashboard() {
                   <button
                     key={tf}
                     onClick={() => setTimeframe(tf)}
-                    className={`flex-1 sm:flex-none px-3 md:px-4 py-1 text-xs font-bold rounded-md transition-colors capitalize ${timeframe === tf ? 'bg-white shadow-sm text-primary' : 'text-slate-500 hover:text-primary'}`}
+                    className={`flex-1 sm:flex-none px-3 md:px-4 py-1 text-xs font-bold rounded-md transition-colors capitalize ${
+                      timeframe === tf ? 'bg-white shadow-sm text-primary' : 'text-slate-500 hover:text-primary'
+                    }`}
                   >
                     {tf}
                   </button>
                 ))}
               </div>
             </div>
-            {/* CHANGED: h-64 → h-40 sm:h-52 md:h-64 so chart doesn't overflow on mobile */}
-            <div className="flex items-end justify-between h-40 sm:h-52 md:h-64 gap-1 md:gap-2 pt-4">
-              {activeChart.map(({ day, height, active, label }, idx) => (
-                <div key={idx} className="flex flex-col items-center gap-1 md:gap-2 flex-1">
-                  <div
-                    className={`w-full rounded-t-lg relative group ${active ? 'bg-primary shadow-lg shadow-primary/20' : 'bg-slate-100'}`}
-                    style={{ height }}
-                  >
-                    {active && label && label !== '$0' && (
-                      <div className="absolute -top-8 md:-top-10 left-1/2 -translate-x-1/2 bg-primary text-white text-[9px] md:text-[10px] font-bold py-0.5 md:py-1 px-1.5 md:px-2 rounded whitespace-nowrap">{label}</div>
-                    )}
+
+            {/* Empty state */}
+            {isEmptyChart ? (
+              <div className="h-40 sm:h-52 md:h-64 flex flex-col items-center justify-center gap-3 text-slate-300">
+                <span className="material-symbols-outlined text-5xl">bar_chart</span>
+                <p className="text-sm font-medium text-slate-400">No spending data for this period</p>
+              </div>
+            ) : (
+              /* Chart bars */
+              <div className="flex items-end justify-between h-40 sm:h-52 md:h-64 gap-1 md:gap-2 pt-8">
+                {activeChart.map(({ day, height, active, label }, idx) => (
+                  <div key={idx} className="flex flex-col items-center gap-1 md:gap-2 flex-1">
+                    <div
+                      className={`w-full rounded-t-lg relative group cursor-pointer transition-colors ${
+                        active
+                          ? 'bg-primary shadow-lg shadow-primary/20'
+                          : 'bg-slate-100 hover:bg-primary/30'
+                      }`}
+                      style={{ height }}
+                    >
+                      {/* Active bar label — always visible */}
+                      {active && label && label !== '$0' && (
+                        <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-primary text-white text-[9px] md:text-[10px] font-bold py-1 px-2 rounded whitespace-nowrap z-10">
+                          {label}
+                        </div>
+                      )}
+                      {/* Inactive bar label — visible on hover */}
+                      {!active && label && label !== '$0' && (
+                        <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-700 text-white text-[9px] md:text-[10px] font-bold py-1 px-2 rounded whitespace-nowrap z-10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                          {label}
+                        </div>
+                      )}
+                    </div>
+                    <span className={`text-[8px] sm:text-[10px] font-bold ${active ? 'text-primary' : 'text-slate-400'}`}>
+                      {day}
+                    </span>
                   </div>
-                  {/* CHANGED: hide day labels on very small screens, show from sm up */}
-                  <span className={`text-[8px] sm:text-[10px] font-bold ${active ? 'text-primary' : 'text-slate-400'}`}>{day}</span>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Recent Transactions */}
@@ -219,8 +244,7 @@ export default function Dashboard() {
               <Link to="/transactions" className="text-sm font-bold text-secondary hover:underline underline-offset-4">View All</Link>
             </div>
 
-            {/* CHANGED: On mobile, show card layout instead of table */}
-            {/* Mobile card layout (hidden on md and up) */}
+            {/* Mobile card layout */}
             <div className="space-y-3 md:hidden">
               {recentTxs.length > 0 ? recentTxs.map((tx) => {
                 const styles = getTxStyles(tx);
@@ -243,7 +267,7 @@ export default function Dashboard() {
               )}
             </div>
 
-            {/* Desktop table layout (hidden on mobile) */}
+            {/* Desktop table layout */}
             <div className="hidden md:block overflow-x-auto">
               <table className="w-full">
                 <thead>
@@ -298,7 +322,6 @@ export default function Dashboard() {
                 <span className="material-symbols-outlined text-sm">add</span>
               </Link>
             </div>
-            {/* Credit Card Visual — unchanged, already responsive */}
             <div className="aspect-[1.6/1] w-full rounded-2xl bg-gradient-to-br from-slate-900 to-slate-700 p-4 md:p-6 relative overflow-hidden text-white flex flex-col justify-between shadow-lg">
               <div className="absolute top-0 right-0 p-6 opacity-20">
                 <svg className="w-16 h-16" fill="currentColor" viewBox="0 0 100 100">
@@ -347,7 +370,6 @@ export default function Dashboard() {
                       <span className="material-symbols-outlined text-[20px]">{bill.icon}</span>
                     </div>
                     <div className="min-w-0">
-                      {/* CHANGED: truncate long bill names on mobile */}
                       <p className="text-sm font-bold text-primary truncate">{bill.name}</p>
                       <p className="text-xs text-slate-500">{bill.due}</p>
                     </div>
@@ -374,7 +396,9 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* ── Modals (unchanged, already responsive) ── */}
+      {/* ── Modals ── */}
+
+      {/* Receive Modal */}
       {isReceiveModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-primary/40 backdrop-blur-sm">
           <div className="bg-white rounded-3xl w-full max-w-sm p-6 md:p-8 shadow-2xl relative">
@@ -403,6 +427,7 @@ export default function Dashboard() {
         </div>
       )}
 
+      {/* Pay Bill Modal */}
       {isPayBillModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-primary/40 backdrop-blur-sm">
           <div className="bg-white rounded-3xl w-full max-w-md p-6 md:p-8 shadow-2xl relative">
