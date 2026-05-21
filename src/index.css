@@ -68,3 +68,18 @@ body {
     color: var(--color-on-surface);
     font-family: var(--font-body);
 }
+
+/* 3D Card Flipping Utilities */
+.card-perspective {
+  perspective: 1500px;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+

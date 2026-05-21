@@ -122,4 +122,41 @@ const freezeCard = async (req, res, next) => {
   }
 };
 
-module.exports = { getCards, createCard, freezeCard };
+/**
+ * @route   PATCH /api/cards/:id/limit
+ * @access  Private
+ */
+const updateSpendingLimit = async (req, res, next) => {
+  try {
+    const { spendingLimit } = req.body;
+    const parsed = parseFloat(spendingLimit);
+
+    if (isNaN(parsed) || parsed < 100 || parsed > 100000) {
+      return res.status(400).json({
+        success: false,
+        message: 'Spending limit must be between $100 and $100,000.',
+      });
+    }
+
+    const card = await Card.findOne({ _id: req.params.id, user: req.user._id });
+    if (!card) {
+      return res.status(404).json({
+        success: false,
+        message: 'Card not found or does not belong to your account.',
+      });
+    }
+
+    card.spendingLimit = parsed;
+    await card.save();
+
+    res.status(200).json({
+      success: true,
+      message: `Spending limit updated to $${parsed.toLocaleString()}.`,
+      data: card,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { getCards, createCard, freezeCard, updateSpendingLimit };

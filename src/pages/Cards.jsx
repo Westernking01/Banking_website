@@ -1,7 +1,32 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { getCards, createCard, freezeCard } from '../api/cardService';
+import { getCards, createCard, freezeCard, updateSpendingLimit } from '../api/cardService';
 import { getTransactions } from '../api/transactionService';
+import Interactive3DCard from '../components/Interactive3DCard';
+
+// ── Inline Toast component ──────────────────────────────────────────────────
+function Toast({ message, type, onDismiss }) {
+  useEffect(() => {
+    const t = setTimeout(onDismiss, 3500);
+    return () => clearTimeout(t);
+  }, [onDismiss]);
+
+  const colours = type === 'success'
+    ? 'bg-secondary text-white'
+    : 'bg-error text-white';
+
+  return (
+    <div className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3.5 rounded-2xl shadow-2xl ${colours} animate-slide-up`}>
+      <span className="material-symbols-outlined text-xl">
+        {type === 'success' ? 'check_circle' : 'error'}
+      </span>
+      <span className="font-bold text-sm">{message}</span>
+      <button onClick={onDismiss} className="ml-2 opacity-70 hover:opacity-100">
+        <span className="material-symbols-outlined text-base">close</span>
+      </button>
+    </div>
+  );
+}
 
 export default function Cards() {
   const { user } = useAuth();
@@ -72,49 +97,8 @@ export default function Cards() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Virtual Card Visual & Primary Info */}
         <div className="lg:col-span-5 space-y-6">
-          {/* High Fidelity Virtual Card */}
-          <div className="relative w-full aspect-[1.586/1] rounded-[24px] overflow-hidden shadow-2xl group">
-            <div className="absolute inset-0 bg-gradient-to-br from-primary via-[#1e3a8a] to-[#00164e]" />
-            <div
-              className="absolute inset-0 opacity-20"
-              style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuB_nrGgNiHC2lpu5iCdQW8IYMSzvjEo-0FWW3F0c-13thS96wViqVO0o93IS0ZBXP9BboLrUs_u5Cnqwiv3tHyyoqlaSPVX_TYuLOCuo8rFvylQJnJtZtO_4a4UCJdLVoaCN1kA2oJxOrLysZABxvS8smzNkX_lN-PHc753F1Zs8pDw3N8tCyKG33YmNV84vNrAr1aq4WgPeHjV288e90ejY8wXMrJESRmZOkn4fgCUDz1Yp7OmCO3Xfin-kQdjVUeiitK05F3BSg')", backgroundSize: 'cover' }}
-            />
-            <div className="relative h-full p-8 flex flex-col justify-between text-white">
-              <div className="flex justify-between items-start">
-                <div className="flex flex-col">
-                  <span className="text-[10px] uppercase tracking-[0.2em] opacity-70">Premium Virtual</span>
-                  <span className="font-headline text-xl font-bold italic tracking-tighter">VAULT</span>
-                </div>
-                <span className="material-symbols-outlined text-4xl">contactless</span>
-              </div>
-              <div className="space-y-1">
-                <div className="flex gap-4 items-center">
-                  {activeCard?.cardNumber ? activeCard.cardNumber.split(' ').map((g, i) => (
-                    <span key={i} className="text-2xl font-headline tracking-[0.15em] font-medium">{g}</span>
-                  )) : ['••••', '••••', '••••', '••••'].map((g, i) => (
-                    <span key={i} className="text-2xl font-headline tracking-[0.15em] font-medium">{g}</span>
-                  ))}
-                </div>
-                <div className="flex gap-8 pt-4">
-                  <div>
-                    <p className="text-[8px] uppercase tracking-widest opacity-60">Expiry Date</p>
-                    <p className="text-sm font-medium tracking-widest">{activeCard?.expiryMonth || '12'} / {activeCard?.expiryYear || '28'}</p>
-                  </div>
-                  <div>
-                    <p className="text-[8px] uppercase tracking-widest opacity-60">CVV</p>
-                    <p className="text-sm font-medium tracking-widest">•••</p>
-                  </div>
-                </div>
-              </div>
-              <div className="flex justify-between items-end">
-                <p className="text-lg font-headline font-semibold tracking-wide">{user?.name?.toUpperCase() || 'VAULT MEMBER'}</p>
-                <div className="w-12 h-8 rounded-md bg-white/10 backdrop-blur-md flex items-center justify-center">
-                  <div className="w-6 h-6 rounded-full bg-[#eb001b] -mr-2 opacity-90" />
-                  <div className="w-6 h-6 rounded-full bg-[#f79e1b] opacity-90" />
-                </div>
-              </div>
-            </div>
-          </div>
+          {/* High Fidelity 3D Interactive Virtual Card */}
+          <Interactive3DCard card={activeCard} user={user} />
 
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-surface-container-low p-5 rounded-2xl">

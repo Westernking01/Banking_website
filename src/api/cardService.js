@@ -14,3 +14,8 @@ export const freezeCard = async (cardId) => {
   const { data } = await client.patch(`/cards/${cardId}/freeze`);
   return data;
 };
+
+export const updateSpendingLimit = async (cardId, spendingLimit) => {
+  const { data } = await client.patch(`/cards/${cardId}/limit`, { spendingLimit });
+  return data;
+};
