@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getTransactions, getDashboardStats } from '../api/transactionService';
@@ -10,6 +10,218 @@ const upcomingBills = [
   { icon: 'bolt', bg: 'bg-green-50', color: 'text-green-600', name: 'Utility Bill', due: 'Due in 12 days', amount: '$182.40' },
 ];
 
+// ── Line Chart Component ──────────────────────────────────────────────────────
+function LineChart({ data }) {
+  const [tooltip, setTooltip] = useState(null);
+  const svgRef = useRef(null);
+
+  const width = 600;
+  const height = 200;
+  const paddingX = 20;
+  const paddingY = 20;
+  const chartWidth = width - paddingX * 2;
+  const chartHeight = height - paddingY * 2;
+
+  const values = data.map((d) => {
+    const num = parseFloat(d.label?.replace(/[^0-9.]/g, '') || 0);
+    return d.label?.includes('k') ? num * 1000 : num;
+  });
+
+  const maxVal = Math.max(...values, 1);
+  const minVal = 0;
+
+  const points = data.map((d, i) => {
+    const x = paddingX + (i / (data.length - 1)) * chartWidth;
+    const val = values[i];
+    const y = paddingY + chartHeight - ((val - minVal) / (maxVal - minVal)) * chartHeight;
+    return { x, y, val, day: d.day, label: d.label, active: d.active };
+  });
+
+  const polylinePoints = points.map((p) => `${p.x},${p.y}`).join(' ');
+
+  // Build smooth path using cubic bezier
+  const buildPath = (pts) => {
+    if (pts.length < 2) return '';
+    let d = `M ${pts[0].x} ${pts[0].y}`;
+    for (let i = 1; i < pts.length; i++) {
+      const prev = pts[i - 1];
+      const curr = pts[i];
+      const cpX = (prev.x + curr.x) / 2;
+      d += ` C ${cpX} ${prev.y}, ${cpX} ${curr.y}, ${curr.x} ${curr.y}`;
+    }
+    return d;
+  };
+
+  // Build fill path (same curve but close at bottom)
+  const buildFillPath = (pts) => {
+    if (pts.length < 2) return '';
+    let d = `M ${pts[0].x} ${height - paddingY}`;
+    d += ` L ${pts[0].x} ${pts[0].y}`;
+    for (let i = 1; i < pts.length; i++) {
+      const prev = pts[i - 1];
+      const curr = pts[i];
+      const cpX = (prev.x + curr.x) / 2;
+      d += ` C ${cpX} ${prev.y}, ${cpX} ${curr.y}, ${curr.x} ${curr.y}`;
+    }
+    d += ` L ${pts[pts.length - 1].x} ${height - paddingY} Z`;
+    return d;
+  };
+
+  const linePath = buildPath(points);
+  const fillPath = buildFillPath(points);
+
+  const handleMouseMove = (e) => {
+    if (!svgRef.current) return;
+    const rect = svgRef.current.getBoundingClientRect();
+    const svgX = ((e.clientX - rect.left) / rect.width) * width;
+    // Find nearest point
+    let nearest = points[0];
+    let minDist = Infinity;
+    points.forEach((p) => {
+      const dist = Math.abs(p.x - svgX);
+      if (dist < minDist) { minDist = dist; nearest = p; }
+    });
+    setTooltip(nearest);
+  };
+
+  const isAllZero = values.every((v) => v === 0);
+
+  if (isAllZero) {
+    return (
+      <div className="h-52 flex flex-col items-center justify-center gap-3 text-slate-300">
+        <span className="material-symbols-outlined text-5xl">show_chart</span>
+        <p className="text-sm font-medium text-slate-400">No spending data for this period</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative select-none">
+      <svg
+        ref={svgRef}
+        viewBox={`0 0 ${width} ${height}`}
+        className="w-full h-40 sm:h-48 md:h-52 overflow-visible"
+        onMouseMove={handleMouseMove}
+        onMouseLeave={() => setTooltip(null)}
+      >
+        <defs>
+          {/* Gradient fill under the line */}
+          <linearGradient id="lineGradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="var(--color-primary, #4F6AF5)" stopOpacity="0.18" />
+            <stop offset="100%" stopColor="var(--color-primary, #4F6AF5)" stopOpacity="0" />
+          </linearGradient>
+          {/* Glow filter for the line */}
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="2" result="coloredBlur" />
+            <feMerge>
+              <feMergeNode in="coloredBlur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
+
+        {/* Horizontal grid lines */}
+        {[0.25, 0.5, 0.75, 1].map((ratio, i) => {
+          const y = paddingY + chartHeight - ratio * chartHeight;
+          const val = maxVal * ratio;
+          const label = val >= 1000 ? `$${(val / 1000).toFixed(1)}k` : `$${val.toFixed(0)}`;
+          return (
+            <g key={i}>
+              <line
+                x1={paddingX} y1={y}
+                x2={width - paddingX} y2={y}
+                stroke="#e2e8f0" strokeWidth="1" strokeDasharray="4 4"
+              />
+              <text
+                x={paddingX - 4} y={y + 4}
+                textAnchor="end"
+                fontSize="9"
+                fill="#94a3b8"
+                fontWeight="600"
+              >
+                {label}
+              </text>
+            </g>
+          );
+        })}
+
+        {/* Fill under curve */}
+        <path d={fillPath} fill="url(#lineGradient)" />
+
+        {/* Main line */}
+        <path
+          d={linePath}
+          fill="none"
+          stroke="var(--color-primary, #4F6AF5)"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          filter="url(#glow)"
+        />
+
+        {/* Data points */}
+        {points.map((p, i) => (
+          <g key={i}>
+            {/* Outer ring on active/hovered */}
+            {(p.active || (tooltip && tooltip.day === p.day)) && (
+              <circle
+                cx={p.x} cy={p.y} r="8"
+                fill="var(--color-primary, #4F6AF5)"
+                fillOpacity="0.15"
+              />
+            )}
+            <circle
+              cx={p.x} cy={p.y} r="4"
+              fill={p.active ? 'var(--color-primary, #4F6AF5)' : 'white'}
+              stroke="var(--color-primary, #4F6AF5)"
+              strokeWidth="2"
+            />
+          </g>
+        ))}
+
+        {/* Vertical hover line */}
+        {tooltip && (
+          <line
+            x1={tooltip.x} y1={paddingY}
+            x2={tooltip.x} y2={height - paddingY}
+            stroke="var(--color-primary, #4F6AF5)"
+            strokeWidth="1"
+            strokeDasharray="4 4"
+            opacity="0.4"
+          />
+        )}
+
+        {/* X-axis labels */}
+        {points.map((p, i) => (
+          <text
+            key={i}
+            x={p.x} y={height}
+            textAnchor="middle"
+            fontSize="9"
+            fill={p.active ? 'var(--color-primary, #4F6AF5)' : '#94a3b8'}
+            fontWeight={p.active ? '700' : '600'}
+          >
+            {p.day}
+          </text>
+        ))}
+      </svg>
+
+      {/* Tooltip bubble */}
+      {tooltip && tooltip.val > 0 && (
+        <div
+          className="absolute -top-8 pointer-events-none z-20 bg-primary text-white text-[10px] font-bold py-1 px-2.5 rounded-lg shadow-lg whitespace-nowrap transform -translate-x-1/2"
+          style={{
+            left: `${(points.find(p => p.day === tooltip.day)?.x / 600) * 100}%`,
+          }}
+        >
+          {tooltip.label} — {tooltip.day}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Dashboard ─────────────────────────────────────────────────────────────────
 export default function Dashboard() {
   const { user, updateUser } = useAuth();
   const balance = user?.balance?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00';
@@ -44,23 +256,9 @@ export default function Dashboard() {
 
   const getTxStyles = (tx) => {
     if (tx.type === 'credit') {
-      return {
-        icon: 'account_balance_wallet',
-        iconColor: 'text-secondary',
-        categoryBg: 'bg-secondary-container',
-        categoryColor: 'text-on-secondary-container',
-        amountColor: 'text-secondary',
-        amountPrefix: '+',
-      };
+      return { icon: 'account_balance_wallet', iconColor: 'text-secondary', categoryBg: 'bg-secondary-container', categoryColor: 'text-on-secondary-container', amountColor: 'text-secondary', amountPrefix: '+' };
     }
-    return {
-      icon: 'payment',
-      iconColor: 'text-primary',
-      categoryBg: 'bg-surface-container',
-      categoryColor: 'text-on-surface-variant',
-      amountColor: 'text-error',
-      amountPrefix: '-',
-    };
+    return { icon: 'payment', iconColor: 'text-primary', categoryBg: 'bg-surface-container', categoryColor: 'text-on-surface-variant', amountColor: 'text-error', amountPrefix: '-' };
   };
 
   const handlePayBill = async (bill) => {
@@ -88,7 +286,6 @@ export default function Dashboard() {
   };
 
   const activeChart = stats.spendingAnalytics ? stats.spendingAnalytics[timeframe] : null;
-  const isEmptyChart = !activeChart || activeChart.every((bar) => bar.label === '$0');
 
   return (
     <div className="p-4 md:p-6 lg:p-8 space-y-4 md:space-y-6 lg:space-y-8 max-w-[1600px] mx-auto">
@@ -177,10 +374,13 @@ export default function Dashboard() {
         {/* Left Column */}
         <div className="col-span-12 xl:col-span-7 space-y-4 md:space-y-6">
 
-          {/* ── Spending Analytics Chart ── */}
+          {/* ── Spending Analytics — Line Chart ── */}
           <div className="bg-white rounded-3xl p-4 md:p-6 lg:p-8 shadow-sm">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3">
-              <h2 className="text-lg md:text-xl font-bold font-headline text-primary">Spending Analytics</h2>
+              <div>
+                <h2 className="text-lg md:text-xl font-bold font-headline text-primary">Spending Analytics</h2>
+                <p className="text-xs text-slate-400 mt-0.5">Debit spending over time</p>
+              </div>
               <div className="flex bg-surface-container-low p-1 rounded-lg w-full sm:w-auto">
                 {['hourly', 'daily', 'monthly'].map((tf) => (
                   <button
@@ -196,43 +396,45 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Empty state */}
-            {isEmptyChart ? (
-              <div className="h-40 sm:h-52 md:h-64 flex flex-col items-center justify-center gap-3 text-slate-300">
-                <span className="material-symbols-outlined text-5xl">bar_chart</span>
-                <p className="text-sm font-medium text-slate-400">No spending data for this period</p>
-              </div>
-            ) : (
-              /* Chart bars */
-              <div className="flex items-end justify-between h-40 sm:h-52 md:h-64 gap-1 md:gap-2 pt-8">
-                {activeChart.map(({ day, height, active, label }, idx) => (
-                  <div key={idx} className="flex flex-col items-center gap-1 md:gap-2 flex-1">
-                    <div
-                      className={`w-full rounded-t-lg relative group cursor-pointer transition-colors ${
-                        active
-                          ? 'bg-primary shadow-lg shadow-primary/20'
-                          : 'bg-slate-100 hover:bg-primary/30'
-                      }`}
-                      style={{ height }}
-                    >
-                      {/* Active bar label — always visible */}
-                      {active && label && label !== '$0' && (
-                        <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-primary text-white text-[9px] md:text-[10px] font-bold py-1 px-2 rounded whitespace-nowrap z-10">
-                          {label}
-                        </div>
-                      )}
-                      {/* Inactive bar label — visible on hover */}
-                      {!active && label && label !== '$0' && (
-                        <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-700 text-white text-[9px] md:text-[10px] font-bold py-1 px-2 rounded whitespace-nowrap z-10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                          {label}
-                        </div>
-                      )}
-                    </div>
-                    <span className={`text-[8px] sm:text-[10px] font-bold ${active ? 'text-primary' : 'text-slate-400'}`}>
-                      {day}
+            {/* Summary row */}
+            {activeChart && (
+              <div className="flex gap-6 mb-4">
+                <div>
+                  <p className="text-[10px] text-slate-400 font-bold uppercase mb-0.5">Total Spent</p>
+                  <p className="text-sm font-black text-primary">
+                    ${activeChart.reduce((sum, d) => {
+                      const num = parseFloat(d.label?.replace(/[^0-9.]/g, '') || 0);
+                      return sum + (d.label?.includes('k') ? num * 1000 : num);
+                    }, 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-slate-400 font-bold uppercase mb-0.5">Peak</p>
+                  <p className="text-sm font-black text-primary">
+                    {activeChart.reduce((max, d) => {
+                      const num = parseFloat(d.label?.replace(/[^0-9.]/g, '') || 0);
+                      const val = d.label?.includes('k') ? num * 1000 : num;
+                      return val > max.val ? { val, label: d.label, day: d.day } : max;
+                    }, { val: 0, label: '$0', day: '' }).label} 
+                    <span className="text-slate-400 font-medium text-[10px] ml-1">
+                      {activeChart.reduce((max, d) => {
+                        const num = parseFloat(d.label?.replace(/[^0-9.]/g, '') || 0);
+                        const val = d.label?.includes('k') ? num * 1000 : num;
+                        return val > max.val ? { val, label: d.label, day: d.day } : max;
+                      }, { val: 0, label: '$0', day: '' }).day}
                     </span>
-                  </div>
-                ))}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Line Chart */}
+            {activeChart ? (
+              <LineChart data={activeChart} />
+            ) : (
+              <div className="h-52 flex flex-col items-center justify-center gap-3 text-slate-300">
+                <span className="material-symbols-outlined text-5xl">show_chart</span>
+                <p className="text-sm font-medium text-slate-400">Loading chart data...</p>
               </div>
             )}
           </div>
@@ -267,7 +469,7 @@ export default function Dashboard() {
               )}
             </div>
 
-            {/* Desktop table layout */}
+            {/* Desktop table */}
             <div className="hidden md:block overflow-x-auto">
               <table className="w-full">
                 <thead>
@@ -397,8 +599,6 @@ export default function Dashboard() {
       </div>
 
       {/* ── Modals ── */}
-
-      {/* Receive Modal */}
       {isReceiveModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-primary/40 backdrop-blur-sm">
           <div className="bg-white rounded-3xl w-full max-w-sm p-6 md:p-8 shadow-2xl relative">
@@ -427,7 +627,6 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Pay Bill Modal */}
       {isPayBillModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-primary/40 backdrop-blur-sm">
           <div className="bg-white rounded-3xl w-full max-w-md p-6 md:p-8 shadow-2xl relative">
