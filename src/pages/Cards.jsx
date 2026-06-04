@@ -35,6 +35,9 @@ export default function Cards() {
   const [international, setInternational] = useState(true);
   const [recentActivity, setRecentActivity] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [spendingLimit, setSpendingLimit] = useState(12500);
+  const [isUpdatingLimit, setIsUpdatingLimit] = useState(false);
+  const [toast, setToast] = useState(null);
 
   useEffect(() => {
     const fetchCards = async () => {
@@ -42,11 +45,13 @@ export default function Cards() {
         const data = await getCards();
         if (data.success && data.data.length > 0) {
           setActiveCard(data.data[0]);
+          setSpendingLimit(data.data[0].spendingLimit || 12500);
         } else {
           // Auto create a card for the user if they have none
           const newCard = await createCard();
           if (newCard.success) {
             setActiveCard(newCard.data);
+            setSpendingLimit(newCard.data.spendingLimit || 12500);
           }
         }
       } catch (err) {
@@ -83,12 +88,34 @@ export default function Cards() {
     }
   };
 
+  const handleUpdateSpendingLimit = async () => {
+    if (!activeCard) return;
+    setIsUpdatingLimit(true);
+    try {
+      const response = await updateSpendingLimit(activeCard._id, spendingLimit);
+      if (response.success) {
+        setActiveCard(response.data);
+        setToast({ message: 'Spending limit updated successfully!', type: 'success' });
+      }
+    } catch (err) {
+      console.error('Failed to update spending limit:', err);
+      setToast({ message: 'Failed to update spending limit', type: 'error' });
+    } finally {
+      setIsUpdatingLimit(false);
+    }
+  };
+
+  const currentSpending = activeCard?.currentSpending || 8240.50;
+  const remaining = Math.max(0, spendingLimit - currentSpending);
+  const spendingPercentage = Math.min(100, (currentSpending / spendingLimit) * 100);
+
   if (isLoading) {
     return <div className="p-8 text-center text-on-surface-variant">Loading your cards...</div>;
   }
 
   return (
     <div className="max-w-6xl mx-auto">
+      {toast && <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />}
       <header className="mb-10">
         <h1 className="font-headline text-4xl font-extrabold text-primary tracking-tight">Card Management</h1>
         <p className="text-on-surface-variant mt-2">Control your virtual assets and spending limits in real-time.</p>
@@ -184,29 +211,52 @@ export default function Cards() {
           <section className="bg-white p-8 rounded-3xl shadow-sm">
             <div className="flex justify-between items-center mb-8">
               <h3 className="font-headline text-lg font-bold text-primary">Monthly Spending Limit</h3>
-              <span className="text-primary font-headline font-extrabold text-2xl">$12,500</span>
+              <span className="text-primary font-headline font-extrabold text-2xl">${spendingLimit.toLocaleString()}</span>
             </div>
             <div className="space-y-8">
-              <div className="relative h-2 w-full bg-surface-container rounded-full">
-                <div className="absolute left-0 top-0 h-full bg-primary rounded-full w-[65%]" />
-                <div className="absolute left-[65%] top-1/2 -translate-y-1/2 w-6 h-6 bg-white border-4 border-primary rounded-full shadow-lg cursor-pointer" />
+              <div className="relative">
+                <input
+                  type="range"
+                  min="1000"
+                  max="50000"
+                  step="500"
+                  value={spendingLimit}
+                  onChange={(e) => setSpendingLimit(Number(e.target.value))}
+                  className="w-full h-2 bg-surface-container rounded-full appearance-none cursor-pointer accent-primary [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-4 [&::-webkit-slider-thumb]:border-primary [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:cursor-pointer"
+                />
+                <div className="flex justify-between text-xs text-on-surface-variant mt-2">
+                  <span>$1,000</span>
+                  <span>$50,000</span>
+                </div>
+              </div>
+              <div className="relative h-2 w-full bg-surface-container rounded-full overflow-hidden">
+                <div 
+                  className="absolute left-0 top-0 h-full bg-primary rounded-full transition-all duration-300" 
+                  style={{ width: `${spendingPercentage}%` }}
+                />
               </div>
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label className="text-[10px] uppercase font-bold text-[#757682] tracking-wider">Current Spending</label>
                   <div className="bg-surface-container p-4 rounded-xl">
-                    <span className="font-headline font-bold text-primary">$8,240.50</span>
+                    <span className="font-headline font-bold text-primary">${currentSpending.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                   </div>
                 </div>
                 <div className="space-y-2">
                   <label className="text-[10px] uppercase font-bold text-[#757682] tracking-wider">Remaining</label>
                   <div className="bg-surface-container-high p-4 rounded-xl">
-                    <span className="font-headline font-bold text-secondary">$4,259.50</span>
+                    <span className={`font-headline font-bold ${remaining > 0 ? 'text-secondary' : 'text-error'}`}>
+                      ${remaining.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                    </span>
                   </div>
                 </div>
               </div>
-              <button className="w-full bg-gradient-to-r from-primary to-primary-container text-white font-headline font-bold py-4 rounded-xl shadow-lg hover:shadow-primary/20 transition-all active:scale-[0.99]">
-                Update Card Limits
+              <button 
+                onClick={handleUpdateSpendingLimit}
+                disabled={isUpdatingLimit || spendingLimit === activeCard?.spendingLimit}
+                className="w-full bg-gradient-to-r from-primary to-primary-container text-white font-headline font-bold py-4 rounded-xl shadow-lg hover:shadow-primary/20 transition-all active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isUpdatingLimit ? 'Updating...' : 'Update Card Limits'}
               </button>
             </div>
           </section>
