@@ -126,27 +126,27 @@ export default function Cards() {
   return (
     <div className="max-w-6xl mx-auto">
       {toast && <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />}
-      <header className="mb-10">
-        <h1 className="font-headline text-4xl font-extrabold text-primary tracking-tight">Card Management</h1>
+      <header className="mb-10 animate-fade-in">
+        <h1 className="font-headline text-4xl font-extrabold text-primary tracking-tight gradient-text">Card Management</h1>
         <p className="text-on-surface-variant mt-2">Control your virtual assets and spending limits in real-time.</p>
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Virtual Card Visual & Primary Info */}
-        <div className="lg:col-span-5 space-y-6">
+        <div className="lg:col-span-5 space-y-6 animate-slide-up">
           {/* High Fidelity 3D Interactive Virtual Card */}
           <Interactive3DCard card={activeCard} user={user} />
 
           <div className="grid grid-cols-2 gap-4">
-            <div className="bg-surface-container-low p-5 rounded-2xl">
+            <div className="glass-card p-5 rounded-2xl hover-lift">
               <p className="text-xs text-on-surface-variant font-medium">Active Since</p>
-              <p className="text-xl font-headline font-bold text-primary mt-1">{activeCard ? new Date(activeCard.createdAt).toLocaleDateString(undefined, { month: 'short', year: 'numeric' }) : 'N/A'}</p>
+              <p className="text-xl font-headline font-bold text-primary mt-1 number-transition">{activeCard ? new Date(activeCard.createdAt).toLocaleDateString(undefined, { month: 'short', year: 'numeric' }) : 'N/A'}</p>
             </div>
-            <div className="bg-surface-container-low p-5 rounded-2xl">
+            <div className="glass-card p-5 rounded-2xl hover-lift">
               <p className="text-xs text-on-surface-variant font-medium">Card Status</p>
               <div className="flex items-center gap-2 mt-1">
-                <span className={`w-2 h-2 rounded-full ${activeCard?.isFrozen ? 'bg-error' : 'bg-secondary'}`} />
-                <p className={`text-xl font-headline font-bold ${activeCard?.isFrozen ? 'text-error' : 'text-secondary'}`}>
+                <span className={`w-2 h-2 rounded-full status-pulse ${activeCard?.isFrozen ? 'bg-error' : 'bg-secondary'}`} />
+                <p className={`text-xl font-headline font-bold number-transition ${activeCard?.isFrozen ? 'text-error' : 'text-secondary'}`}>
                   {activeCard?.isFrozen ? 'Frozen' : 'Active'}
                 </p>
               </div>
@@ -157,13 +157,13 @@ export default function Cards() {
         {/* Controls & Limits */}
         <div className="lg:col-span-7 space-y-8">
           {/* Security Controls */}
-          <section className="bg-white p-8 rounded-3xl shadow-sm">
+          <section className="glass-card p-8 rounded-3xl animate-slide-in-right stagger-1 hover-lift">
             <h3 className="font-headline text-lg font-bold text-primary mb-6">Security Controls</h3>
             <div className="space-y-6">
               {/* Freeze Card Toggle */}
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between group">
                 <div className="flex items-center gap-4">
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-colors ${activeCard?.isFrozen ? 'bg-error/20 text-error' : 'bg-[#ffdad6]/30 text-[#ba1a1a]'}`}>
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 ${activeCard?.isFrozen ? 'bg-error/20 text-error' : 'bg-[#ffdad6]/30 text-[#ba1a1a]'}`}>
                     <span className="material-symbols-outlined">{activeCard?.isFrozen ? 'severe_cold' : 'ac_unit'}</span>
                   </div>
                   <div>
@@ -188,9 +188,9 @@ export default function Cards() {
                 </button>
               </div>
               {/* Online Payments Toggle */}
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between group">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-secondary-container/30 flex items-center justify-center text-secondary">
+                  <div className="w-12 h-12 rounded-xl bg-secondary-container/30 flex items-center justify-center text-secondary transition-all duration-300 group-hover:scale-110">
                     <span className="material-symbols-outlined">language</span>
                   </div>
                   <div>
@@ -206,9 +206,9 @@ export default function Cards() {
                 </button>
               </div>
               {/* International Use Toggle */}
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between group">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-[#dce1ff]/30 flex items-center justify-center text-primary">
+                  <div className="w-12 h-12 rounded-xl bg-[#dce1ff]/30 flex items-center justify-center text-primary transition-all duration-300 group-hover:scale-110">
                     <span className="material-symbols-outlined">public</span>
                   </div>
                   <div>
@@ -227,10 +227,10 @@ export default function Cards() {
           </section>
 
           {/* Spending Limits */}
-          <section className="bg-white p-8 rounded-3xl shadow-sm">
+          <section className="glass-card p-8 rounded-3xl animate-slide-in-right stagger-2 hover-lift">
             <div className="flex justify-between items-center mb-8">
               <h3 className="font-headline text-lg font-bold text-primary">Monthly Spending Limit</h3>
-              <span className="text-primary font-headline font-extrabold text-2xl">${spendingLimit.toLocaleString()}</span>
+              <span className="text-primary font-headline font-extrabold text-2xl number-transition">${spendingLimit.toLocaleString()}</span>
             </div>
             <div className="space-y-8">
               <div className="relative">
@@ -248,23 +248,24 @@ export default function Cards() {
                   <span>$50,000</span>
                 </div>
               </div>
-              <div className="relative h-2 w-full bg-surface-container rounded-full overflow-hidden">
+              <div className="relative h-3 w-full bg-surface-container rounded-full overflow-hidden">
                 <div 
-                  className="absolute left-0 top-0 h-full bg-primary rounded-full transition-all duration-300" 
+                  className="absolute left-0 top-0 h-full bg-gradient-to-r from-primary to-secondary rounded-full transition-all duration-500 animate-progress" 
                   style={{ width: `${spendingPercentage}%` }}
                 />
+                <div className="absolute inset-0 animate-shimmer opacity-30 rounded-full" />
               </div>
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label className="text-[10px] uppercase font-bold text-[#757682] tracking-wider">Current Spending</label>
-                  <div className="bg-surface-container p-4 rounded-xl">
-                    <span className="font-headline font-bold text-primary">${currentSpending.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                  <div className="bg-surface-container p-4 rounded-xl hover-scale">
+                    <span className="font-headline font-bold text-primary number-transition">${currentSpending.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                   </div>
                 </div>
                 <div className="space-y-2">
                   <label className="text-[10px] uppercase font-bold text-[#757682] tracking-wider">Remaining</label>
-                  <div className="bg-surface-container-high p-4 rounded-xl">
-                    <span className={`font-headline font-bold ${remaining > 0 ? 'text-secondary' : 'text-error'}`}>
+                  <div className="bg-surface-container-high p-4 rounded-xl hover-scale">
+                    <span className={`font-headline font-bold number-transition ${remaining > 0 ? 'text-secondary' : 'text-error'}`}>
                       ${remaining.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                     </span>
                   </div>
@@ -273,7 +274,7 @@ export default function Cards() {
               <button 
                 onClick={handleUpdateSpendingLimit}
                 disabled={isUpdatingLimit || spendingLimit === activeCard?.spendingLimit}
-                className="w-full bg-gradient-to-r from-primary to-primary-container text-white font-headline font-bold py-4 rounded-xl shadow-lg hover:shadow-primary/20 transition-all active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-gradient-to-r from-primary to-primary-container text-white font-headline font-bold py-4 rounded-xl shadow-lg hover:shadow-primary/30 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed btn-shine animate-gradient"
               >
                 {isUpdatingLimit ? 'Updating...' : 'Update Card Limits'}
               </button>
@@ -283,20 +284,20 @@ export default function Cards() {
       </div>
 
       {/* Recent Card Activity */}
-      <section className="mt-12">
+      <section className="mt-12 animate-slide-up stagger-3">
         <div className="flex justify-between items-end mb-6 px-2">
           <div>
             <h3 className="font-headline text-2xl font-bold text-primary">Recent Card Activity</h3>
             <p className="text-on-surface-variant text-sm">Latest transactions specifically for this virtual card.</p>
           </div>
-          <button className="text-secondary font-bold text-sm hover:underline underline-offset-4">View All</button>
+          <button className="text-secondary font-bold text-sm hover:underline underline-offset-4 transition-all hover:text-secondary/80">View All</button>
         </div>
-        <div className="bg-surface-container-low rounded-3xl overflow-hidden p-2">
+        <div className="glass-card rounded-3xl overflow-hidden p-2">
           <div className="space-y-1">
             {recentActivity.length > 0 ? recentActivity.map((tx, i) => (
-              <div key={tx._id} className={`flex items-center justify-between p-4 rounded-2xl hover:bg-white transition-colors group ${i === 0 ? 'bg-white' : ''}`}>
+              <div key={tx._id} className={`flex items-center justify-between p-4 rounded-2xl hover:bg-white/80 transition-all duration-200 group cursor-pointer hover-scale ${i === 0 ? 'bg-white/60' : ''}`}>
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center overflow-hidden">
+                  <div className="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center overflow-hidden transition-transform duration-200 group-hover:scale-110">
                     <span className={`material-symbols-outlined text-2xl ${tx.type === 'credit' ? 'text-secondary' : 'text-primary'}`}>
                       {tx.type === 'credit' ? 'account_balance_wallet' : 'payment'}
                     </span>
