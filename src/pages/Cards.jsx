@@ -37,6 +37,7 @@ export default function Cards() {
   const [isLoading, setIsLoading] = useState(true);
   const [spendingLimit, setSpendingLimit] = useState(12500);
   const [isUpdatingLimit, setIsUpdatingLimit] = useState(false);
+  const [isFreezingCard, setIsFreezingCard] = useState(false);
   const [toast, setToast] = useState(null);
 
   useEffect(() => {
@@ -77,14 +78,23 @@ export default function Cards() {
   }, []);
 
   const handleToggleFreeze = async () => {
-    if (!activeCard) return;
+    if (!activeCard || isFreezingCard) return;
+    setIsFreezingCard(true);
     try {
       const response = await freezeCard(activeCard._id);
       if (response.success) {
         setActiveCard(response.data);
+        const newStatus = response.data.isFrozen;
+        setToast({ 
+          message: newStatus ? 'Card frozen successfully. All transactions blocked.' : 'Card unfrozen. Transactions enabled.', 
+          type: 'success' 
+        });
       }
     } catch (err) {
       console.error('Failed to toggle freeze status:', err);
+      setToast({ message: 'Failed to update card status', type: 'error' });
+    } finally {
+      setIsFreezingCard(false);
     }
   };
 
@@ -153,19 +163,28 @@ export default function Cards() {
               {/* Freeze Card Toggle */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-[#ffdad6]/30 flex items-center justify-center text-[#ba1a1a]">
-                    <span className="material-symbols-outlined">ac_unit</span>
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-colors ${activeCard?.isFrozen ? 'bg-error/20 text-error' : 'bg-[#ffdad6]/30 text-[#ba1a1a]'}`}>
+                    <span className="material-symbols-outlined">{activeCard?.isFrozen ? 'severe_cold' : 'ac_unit'}</span>
                   </div>
                   <div>
                     <p className="font-bold text-primary">Freeze Card</p>
-                    <p className="text-xs text-on-surface-variant">Instantly block all new transactions</p>
+                    <p className="text-xs text-on-surface-variant">
+                      {activeCard?.isFrozen ? 'Card is currently frozen' : 'Instantly block all new transactions'}
+                    </p>
                   </div>
                 </div>
                 <button
                   onClick={handleToggleFreeze}
-                  className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${activeCard?.isFrozen ? 'bg-secondary' : 'bg-[#c5c5d3]'}`}
+                  disabled={isFreezingCard}
+                  className={`w-12 h-6 rounded-full relative transition-colors duration-300 disabled:opacity-50 ${activeCard?.isFrozen ? 'bg-error' : 'bg-[#c5c5d3]'}`}
                 >
-                  <span className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all duration-300 ${activeCard?.isFrozen ? 'right-1' : 'left-1'}`} />
+                  {isFreezingCard ? (
+                    <span className="absolute inset-0 flex items-center justify-center">
+                      <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    </span>
+                  ) : (
+                    <span className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all duration-300 ${activeCard?.isFrozen ? 'right-1' : 'left-1'}`} />
+                  )}
                 </button>
               </div>
               {/* Online Payments Toggle */}
